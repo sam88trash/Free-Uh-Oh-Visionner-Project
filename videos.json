@@ -1,0 +1,19 @@
+[
+  {
+    "file": "videos/video1.mp4",
+    "title": "My First Video",
+    "description": "A short demo video hosted on GitHub Pages.",
+    "thumb": "thumbs/video1.jpg"
+  },
+  {
+    "file": "videos/video2.mp4",
+    "title": "Another Example",
+    "description": "Second example video with a different thumbnail.",
+    "thumb": "thumbs/video2.jpg"
+  },
+  {
+    "file": "videos/video3.mp4",
+    "title": "No Thumbnail Example",
+    "description": "This video doesn't have a thumbnail and will use the default placeholder."
+  }
+]
