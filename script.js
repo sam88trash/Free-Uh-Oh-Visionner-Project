@@ -31,11 +31,39 @@ async function loadManifest(){
   }
 }
 
+async function generateThumbnail(videoUrl) {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.src = videoUrl;
+    video.crossOrigin = 'anonymous'; // needed for remote videos with CORS
+    video.muted = true;
+    video.currentTime = 0;
+    video.addEventListener('loadeddata', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg');
+      resolve(dataUrl);
+    });
+    video.addEventListener('error', reject);
+  });
+}
+
 function renderGrid(){
   const q = searchInput.value.trim().toLowerCase();
   let list = videos.slice();
   if(sortSelect.value === 'title') list.sort((a,b)=> (a.title||'').localeCompare(b.title||''));
   if(q) list = list.filter(v => ((v.title||'') + ' ' + (v.description||'')).toLowerCase().includes(q));
+  if(!v.thumb || v.thumb === "none"){
+    generateThumbnail(v.file).then(dataUrl => {
+      img.src = dataUrl;
+    }).catch(() => {
+      img.src = 'default-placeholder.png';
+    });
+  }
+
   
   grid.innerHTML = '';
   empty.style.display = list.length === 0 ? 'block' : 'none';
