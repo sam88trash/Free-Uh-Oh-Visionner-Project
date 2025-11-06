@@ -129,7 +129,7 @@ Customization pointers:
 
   <script>
     // CONFIG: change to your manifest path if needed
-    const MANIFEST_URL = './videos.json';
+    const MANIFEST_URL = './videos.json?t=' + new Date().getTime();
 
     const grid = document.getElementById('grid');
     const empty = document.getElementById('empty');
