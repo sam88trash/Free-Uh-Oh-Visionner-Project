@@ -18,8 +18,10 @@ let videos = [];
 
 async function loadManifest(){
   try{
-    const res = await fetch(MANIFEST_URL, {cache: 'no-cache'});
-    if(!res.ok) throw new Error('Manifest not found');
+    // append a fresh timestamp every time we fetch
+    const url = './videos.json?t=' + new Date().getTime();
+    const res = await fetch(url, {cache: 'no-store'});
+    if(!res.ok) throw new Error('Manifest not found: ' + res.status);
     videos = await res.json();
     renderGrid();
   }catch(e){
