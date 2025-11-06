@@ -31,24 +31,19 @@ async function loadManifest(){
   }
 }
 
-async function generateThumbnail(videoUrl) {
-  return new Promise((resolve, reject) => {
-    const video = document.createElement('video');
-    video.src = videoUrl;
-    video.crossOrigin = 'anonymous'; // needed for remote videos with CORS
-    video.muted = true;
-    video.currentTime = 0;
-    video.addEventListener('loadeddata', () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/jpeg');
-      resolve(dataUrl);
-    });
-    video.addEventListener('error', reject);
-  });
+async function generateCardThumbnail(card, v) {
+  if (!v.thumb || v.thumb === "none") {
+    try {
+      // Capture the card element as a thumbnail
+      const canvas = await html2canvas(card, { backgroundColor: null });
+      const dataUrl = canvas.toDataURL("image/jpeg");
+      card.querySelector(".thumb").src = dataUrl;
+      // Optionally store this in-memory for the session
+      v.thumb = dataUrl; 
+    } catch (err) {
+      console.warn("Could not generate thumbnail for card:", err);
+    }
+  }
 }
 
 function renderGrid(){
@@ -84,6 +79,8 @@ function renderGrid(){
 
     card.addEventListener('click', ()=> openPlayer(v));
     grid.appendChild(node);
+    // Generate placeholder thumbnail if needed
+    generateCardThumbnail(card, v);
   }
 }
 
