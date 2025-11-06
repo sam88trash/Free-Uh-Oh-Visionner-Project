@@ -1,4 +1,4 @@
-// CONFIG: append timestamp to prevent caching
+// CONFIG
 const MANIFEST_URL = './videos.json?t=' + new Date().getTime();
 
 const grid = document.getElementById('grid');
@@ -16,55 +16,36 @@ const modalDesc = document.getElementById('modalDesc');
 
 let videos = [];
 
-async function loadManifest(){
-  try{
-    // append a fresh timestamp every time we fetch
-    const url = './videos.json?t=' + new Date().getTime();
-    const res = await fetch(url, {cache: 'no-store'});
-    if(!res.ok) throw new Error('Manifest not found: ' + res.status);
+// Load JSON manifest
+async function loadManifest() {
+  try {
+    const res = await fetch(MANIFEST_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Manifest not found: ' + res.status);
     videos = await res.json();
     renderGrid();
-  }catch(e){
+  } catch (e) {
     console.warn('Could not load manifest:', e);
     grid.innerHTML = '';
     empty.style.display = 'block';
   }
 }
 
-async function generateCardThumbnail(card, v) {
-  if (!v.thumb || v.thumb === "none") {
-    try {
-      // Capture the card element as a thumbnail
-      const canvas = await html2canvas(card, { backgroundColor: null });
-      const dataUrl = canvas.toDataURL("image/jpeg");
-      card.querySelector(".thumb").src = dataUrl;
-      // Optionally store this in-memory for the session
-      v.thumb = dataUrl; 
-    } catch (err) {
-      console.warn("Could not generate thumbnail for card:", err);
-    }
-  }
-}
-
-function renderGrid(){
+// Render video cards
+function renderGrid() {
   const q = searchInput.value.trim().toLowerCase();
   let list = videos.slice();
-  if(sortSelect.value === 'title') list.sort((a,b)=> (a.title||'').localeCompare(b.title||''));
-  if(q) list = list.filter(v => ((v.title||'') + ' ' + (v.description||'')).toLowerCase().includes(q));
-  if(!v.thumb || v.thumb === "none"){
-    generateThumbnail(v.file).then(dataUrl => {
-      img.src = dataUrl;
-    }).catch(() => {
-      img.src = 'default-placeholder.png';
-    });
+  if (sortSelect.value === 'title') {
+    list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+  }
+  if (q) {
+    list = list.filter(v => ((v.title || '') + ' ' + (v.description || '')).toLowerCase().includes(q));
   }
 
-  
   grid.innerHTML = '';
   empty.style.display = list.length === 0 ? 'block' : 'none';
-  if(list.length === 0) return;
+  if (list.length === 0) return;
 
-  for(const v of list){
+  for (const v of list) {
     const node = tpl.content.cloneNode(true);
     const card = node.querySelector('.card');
     const img = node.querySelector('.thumb');
@@ -72,45 +53,84 @@ function renderGrid(){
     const desc = node.querySelector('.desc');
 
     card.dataset.file = v.file;
-    img.src = v.thumb || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23081223"/><text x="50%" y="50%" fill="%239aa4b2" font-size="24" text-anchor="middle" dominant-baseline="central">No+thumb</text></svg>';
     img.alt = v.title || 'video thumb';
     title.textContent = v.title || v.file;
     desc.textContent = v.description || '';
 
-    card.addEventListener('click', ()=> openPlayer(v));
+    // Use existing thumb or placeholder
+    if (v.thumb && v.thumb !== 'none') {
+      img.src = v.thumb;
+    } else {
+      img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23081223"/><text x="50%" y="50%" fill="%239aa4b2" font-size="24" text-anchor="middle" dominant-baseline="central">No+thumb</text></svg>';
+    }
+
+    // Card click opens player
+    card.addEventListener('click', () => openPlayer(v));
+
+    // Append card first
     grid.appendChild(node);
-    // Generate placeholder thumbnail if needed
-    generateCardThumbnail(card, v);
+
+    // Generate in-browser placeholder if missing
+    if (!v.thumb || v.thumb === 'none') {
+      generateCardThumbnail(card, v);
+    }
   }
 }
 
-function openPlayer(v){
+// Generate placeholder thumbnail using html2canvas
+async function generateCardThumbnail(card, v) {
+  try {
+    const storageKey = 'thumb_' + v.file;
+    const cached = localStorage.getItem(storageKey);
+    if (cached) {
+      card.querySelector('.thumb').src = cached;
+      return;
+    }
+
+    const canvas = await html2canvas(card, { backgroundColor: null });
+    const dataUrl = canvas.toDataURL('image/jpeg');
+    card.querySelector('.thumb').src = dataUrl;
+
+    // Cache in localStorage
+    localStorage.setItem(storageKey, dataUrl);
+  } catch (err) {
+    console.warn('Could not generate thumbnail for card:', err);
+  }
+}
+
+// Fullscreen video player
+function openPlayer(v) {
   modal.style.display = 'flex';
-  modal.setAttribute('aria-hidden','false');
+  modal.setAttribute('aria-hidden', 'false');
   videoPlayer.src = v.file;
   videoPlayer.poster = v.thumb || '';
   modalTitle.textContent = v.title || v.file;
   modalDesc.textContent = v.description || '';
-  downloadBtn.onclick = ()=>{ window.open(v.file, '_blank'); };
-  videoPlayer.play().catch(()=>{});
+  downloadBtn.onclick = () => { window.open(v.file, '_blank'); };
+  videoPlayer.play().catch(() => {});
   document.body.style.overflow = 'hidden';
 }
 
-function closePlayer(){
+function closePlayer() {
   modal.style.display = 'none';
-  modal.setAttribute('aria-hidden','true');
+  modal.setAttribute('aria-hidden', 'true');
   videoPlayer.pause();
-  try{ videoPlayer.removeAttribute('src'); videoPlayer.load(); }catch(e){}
+  try { videoPlayer.removeAttribute('src'); videoPlayer.load(); } catch (e) {}
   document.body.style.overflow = '';
 }
 
+// Event listeners
 closeBtn.addEventListener('click', closePlayer);
-modal.addEventListener('click', (e)=>{ if(e.target===modal) closePlayer(); });
-document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closePlayer(); });
-
+modal.addEventListener('click', (e) => { if (e.target === modal) closePlayer(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
 searchInput.addEventListener('input', debounce(renderGrid, 180));
 sortSelect.addEventListener('change', renderGrid);
 
-function debounce(fn, wait){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }}
+// Debounce helper
+function debounce(fn, wait) {
+  let t;
+  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), wait); };
+}
 
+// Initialize
 loadManifest();
