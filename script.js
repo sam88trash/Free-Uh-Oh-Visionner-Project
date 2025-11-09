@@ -110,10 +110,6 @@ function openPlayer(v) {
 }
 
 
-const modal = document.getElementById('modal');
-const closeBtn = document.getElementById('closeBtn');
-const videoPlayer = document.getElementById('videoPlayer');
-
 function closePlayer() {
   modal.style.display = 'none';
   modal.setAttribute('aria-hidden', 'true');
