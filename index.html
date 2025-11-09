@@ -1,16 +1,18 @@
 <!doctype html>
 <html lang="en">
+  
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Free Uh-Oh Viewer Project</title>
+  <title>Free Videos Viewer Project</title>
   <link rel="stylesheet" href="style.css">
 </head>
+  
 <body>
   <div class="wrap">
     <header>
       <div>
-        <h1>Free Uh-Oh Viewer Project</h1>
+        <h1>Free Videos Viewer Project</h1>
         <div class="subtitle">Static site to list & play videos hosted externally and provide a nice UI with more control</div>
       </div>
       <div class="controls">
@@ -28,11 +30,11 @@
         No videos found. Add a <code>videos.json</code> manifest and place files in <code>videos/</code>.
       </div>
     </main>
-
-    <footer>
-      Absolutely vibe-coded.
-    </footer>
   </div>
+
+  <footer>
+    Absolutely vibe-coded.
+  </footer>
 
   <template id="cardTpl">
     <div class="card" data-file="">
@@ -44,11 +46,11 @@
     </div>
   </template>
 
-  <div id="modal" style="display:none" class="modal" aria-hidden="true">
+  <div id="modal" class="modal" style="display:none" aria-hidden="true">
     <div class="player" role="dialog" aria-modal="true">
       <div class="row">
         <div style="font-weight:600" id="modalTitle"></div>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div style="display:flex;gap:8px;align-items:right">
           <button id="downloadBtn" class="close">Download</button>
           <button id="closeBtn" class="close">Close</button>
         </div>
@@ -58,6 +60,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="script.js"></script>
 </body>
 </html>

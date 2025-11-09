@@ -115,47 +115,57 @@ select {
   position: fixed;
   inset: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.95);
+  background: rgba(0, 0, 0, 1);
   z-index: 1000;
   padding: 0;
+  margin: 0;
 }
 
 .player {
   width: 100vw;
   height: 100vh;
-  background: black;
-  border-radius: 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0;
+  justify-content: space-between;
+  background: black;
+  padding: 0;
 }
 
 .player video {
+  flex: 1;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 0;
+  background: black;
+  border: none;
 }
 
 .player .row {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  align-items: center;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .close {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #e6eef6;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
 }
+
+.close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 
 footer {
   margin-top: 20px;
@@ -169,3 +179,20 @@ footer {
     height: 110px;
   }
 }
+
+
+/* Force modal to stay hidden when aria-hidden is true */
+#modal[aria-hidden="true"] { display: none ; pointer-events: none ; }
+
+/* Make sure grid is visible and above any accidental overlay */
+#grid {
+  display: grid ;
+  z-index: 2 ;
+  position: relative ;
+}
+
+/* Make empty message clearly visible */
+/*.empty { display: block ; z-index:2 ; position: relative ; }*/
+
+/* Ensure header/footer stacking doesn't cover grid */
+header, footer { z-index: 3; position: relative; }
