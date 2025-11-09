@@ -179,3 +179,20 @@ footer {
     height: 110px;
   }
 }
+
+
+/* Force modal to stay hidden when aria-hidden is true */
+#modal[aria-hidden="true"] { display: none !important; pointer-events: none !important; }
+
+/* Make sure grid is visible and above any accidental overlay */
+#grid {
+  display: grid !important;
+  z-index: 2 !important;
+  position: relative !important;
+}
+
+/* Make empty message clearly visible */
+.empty { display: block !important; z-index:2 !important; position: relative !important; }
+
+/* Ensure header/footer stacking doesn't cover grid */
+header, footer { z-index: 3; position: relative; }
