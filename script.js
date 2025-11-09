@@ -47,6 +47,7 @@ function renderGrid() {
 
   grid.innerHTML = '';
   empty.style.display = list.length === 0 ? 'block' : 'none';
+  console.log('Rendering grid:', list.length, 'items', list);
   if (list.length === 0) return;
 
   for (const v of list) {
