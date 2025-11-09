@@ -110,20 +110,22 @@ function openPlayer(v) {
 }
 
 
+const modal = document.getElementById('modal');
+const closeBtn = document.getElementById('closeBtn');
+const videoPlayer = document.getElementById('videoPlayer');
+
 function closePlayer() {
-  const modal = document.getElementById('modal');
-  const video = document.getElementById('videoPlayer');
   modal.style.display = 'none';
-  video.pause();
-  video.removeAttribute('src');
-  video.load();
-  document.body.style.overflow = 'auto';
+  modal.setAttribute('aria-hidden', 'true');
+  videoPlayer.pause();
+  videoPlayer.removeAttribute('src');
+  videoPlayer.load();
+  document.body.style.overflow = '';
 }
 
 
 // Event listeners
 closeBtn.addEventListener('click', closePlayer);
-modal.addEventListener('click', (e) => { if (e.target === modal) closePlayer(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
 searchInput.addEventListener('input', debounce(renderGrid, 180));
 sortSelect.addEventListener('change', renderGrid);
