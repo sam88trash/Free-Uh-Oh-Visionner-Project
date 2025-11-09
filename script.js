@@ -77,14 +77,38 @@ function renderGrid() {
 function openPlayer(v) {
   modal.style.display = 'flex';
   modal.setAttribute('aria-hidden', 'false');
-  videoPlayer.src = v.file;
-  videoPlayer.poster = v.thumb || '';
   modalTitle.textContent = v.title || v.file;
   modalDesc.textContent = v.description || '';
-  downloadBtn.onclick = () => { window.open(v.file, '_blank'); };
-  videoPlayer.play().catch(() => {});
+  downloadBtn.onclick = () => window.open(v.file, '_blank');
+
+  const src = v.file;
+  videoPlayer.poster = v.thumb || '';
+  
+  // If HLS.js is supported and it's an m3u8 file
+  if (Hls.isSupported() && src.endsWith('.m3u8')) {
+    const hls = new Hls();
+    hls.loadSource(src);
+    hls.attachMedia(videoPlayer);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      videoPlayer.play().catch(() => {});
+    });
+  } 
+  // If the browser supports HLS natively (Safari, iOS)
+  else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+    videoPlayer.src = src;
+    videoPlayer.addEventListener('loadedmetadata', () => {
+      videoPlayer.play().catch(() => {});
+    });
+  } 
+  // Otherwise normal video (mp4, webm, etc.)
+  else {
+    videoPlayer.src = src;
+    videoPlayer.play().catch(() => {});
+  }
+
   document.body.style.overflow = 'hidden';
 }
+
 
 function closePlayer() {
   modal.style.display = 'none';
