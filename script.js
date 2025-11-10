@@ -56,6 +56,7 @@ function renderGrid() {
     const node = tpl.content.cloneNode(true);
     const card = node.querySelector('.card');
     const img = node.querySelector('.thumb');
+    const meta = node.querySelector('.meta');
     const title = node.querySelector('.title');
     const desc = node.querySelector('.desc');
 
