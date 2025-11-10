@@ -69,6 +69,8 @@ select {
 }
 
 .card {
+  display: flex;
+  flex-direction: column;
   background: var(--card);
   border-radius: 12px;
   padding: 10px;
@@ -89,6 +91,8 @@ select {
   height: 130px;
   border-radius: 8px;
   overflow: hidden;
+  flex-shrink: 0; /* ensures it stays at the top */
+  margin-bottom: 8px;
 }
 
 .thumb, .preview {
