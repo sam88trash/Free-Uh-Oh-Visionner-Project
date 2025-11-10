@@ -69,6 +69,14 @@ function renderGrid() {
       ? v.thumb
       : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23081223"/><text x="50%" y="50%" fill="%239aa4b2" font-size="24" text-anchor="middle" dominant-baseline="central">No+thumb</text></svg>';
 
+    const media = document.createElement('div');
+    media.className = 'media';
+    
+    const img = document.createElement('img');
+    img.className = 'thumb';
+    img.src = v.thumb || 'placeholder.jpg';
+    img.alt = v.title;
+    
     const video = document.createElement('video');
     video.className = 'preview';
     video.src = v.preview || v.file; // use dedicated preview if available, else main video
@@ -77,9 +85,10 @@ function renderGrid() {
     video.playsInline = true;
     video.preload = 'metadata';
     video.style.display = 'none';
-      
-    card.appendChild(img);
-    card.appendChild(video);
+    
+    media.appendChild(img);
+    media.appendChild(video);
+    card.appendChild(media);
 
     // Card click opens video player
     card.addEventListener('click', () => openPlayer(v));
