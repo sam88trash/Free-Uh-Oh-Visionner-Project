@@ -1,15 +1,18 @@
+/* Color Palette : #EE05F2 #BC04BF #7C038C #380140 #220126 */
+
 :root {
-  --bg: #0f1720;
-  --card: #0b1220;
-  --muted: #9aa4b2;
-  --accent: #3b82f6;
+  --bg: #220126;
+  --card: #380140;
+  --mid: #7C038C;
+  --muted: #BC04BF;
+  --accent: #EE05F2;
 }
 
 html, body {
   height: 100%;
   margin: 0;
-  background: linear-gradient(180deg, #071023 0%, #071426 100%);
-  color: #e6eef6;
+  background: var(--bg);
+  color: var(--accent);
   font-family: Inter, ui-sans-serif, system-ui, Arial, sans-serif;
 }
 
@@ -66,10 +69,10 @@ select {
 }
 
 .card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  background: var(--card);
   border-radius: 12px;
   padding: 10px;
-  box-shadow: 0 6px 20px rgba(2, 6, 23, 0.6);
+  box-shadow: 0 6px 20px rgba(0,0,0, 0.7);
   cursor: pointer;
   transition: transform 0.14s;
 }
@@ -83,7 +86,7 @@ select {
   height: 130px;
   border-radius: 8px;
   object-fit: cover;
-  background: #081223;
+  background: var(--bg);
 }
 
 .meta {
@@ -107,7 +110,7 @@ select {
   border-radius: 10px;
   text-align: center;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.01);
+  background: var(--card);
 }
 
 /* Fullscreen modal */
@@ -118,10 +121,15 @@ select {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 1);
+  background: var(--bg);
   z-index: 1000;
-  padding: 0;
+  padding: 10px;
   margin: 0;
+}
+
+#ModalDesc {
+  color: var(--muted);
+  margin: 10px;
 }
 
 .player {
@@ -130,7 +138,7 @@ select {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: black;
+  background: var(--bg);
   padding: 0;
 }
 
@@ -148,12 +156,12 @@ select {
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px;
-  background: rgba(0, 0, 0, 0.6);
+  background: transparent;
 }
 
 .close {
   background: rgba(255, 255, 255, 0.15);
-  color: #e6eef6;
+  color: var(--accent);
   border: 1px solid rgba(255, 255, 255, 0.25);
   padding: 6px 12px;
   border-radius: 8px;
@@ -169,7 +177,9 @@ select {
 
 footer {
   margin-top: 20px;
+  padding: 10px;
   text-align: center;
+  background: var(--card);
   color: var(--muted);
   font-size: 13px;
 }
