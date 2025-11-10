@@ -67,6 +67,18 @@ function renderGrid() {
       ? v.thumb
       : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23081223"/><text x="50%" y="50%" fill="%239aa4b2" font-size="24" text-anchor="middle" dominant-baseline="central">No+thumb</text></svg>';
 
+    const video = document.createElement('video');
+    video.className = 'preview';
+    video.src = v.preview || v.file; // use dedicated preview if available, else main video
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
+    video.style.display = 'none';
+      
+    card.appendChild(img);
+    card.appendChild(video);
+
     // Card click opens video player
     card.addEventListener('click', () => openPlayer(v));
 
@@ -122,6 +134,19 @@ function closePlayer() {
 
 
 // Event listeners
+card.addEventListener('mouseenter', () => {
+  video.currentTime = 0;
+  img.style.display = 'none';
+  video.style.display = 'block';
+  video.play().catch(() => {});
+});
+
+card.addEventListener('mouseleave', () => {
+  video.pause();
+  video.style.display = 'none';
+  img.style.display = 'block';
+});
+
 closeBtn.addEventListener('click', closePlayer);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
 searchInput.addEventListener('input', debounce(renderGrid, 180));
