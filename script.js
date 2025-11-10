@@ -72,11 +72,6 @@ function renderGrid() {
     const media = document.createElement('div');
     media.className = 'media';
     
-    const img = document.createElement('img');
-    img.className = 'thumb';
-    img.src = v.thumb || 'placeholder.jpg';
-    img.alt = v.title;
-    
     const video = document.createElement('video');
     video.className = 'preview';
     video.src = v.preview || v.file; // use dedicated preview if available, else main video
@@ -86,8 +81,10 @@ function renderGrid() {
     video.preload = 'metadata';
     video.style.display = 'none';
     
+    const imgParent = img.parentNode;
     media.appendChild(img);
     media.appendChild(video);
+    imgParent.insertBefore(media, imgParent.firstChild);
     card.appendChild(media);
 
     // Card click opens video player
