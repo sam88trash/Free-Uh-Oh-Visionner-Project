@@ -16,6 +16,7 @@ const modalDesc = document.getElementById('modalDesc');
 
 let videos = [];
 
+
 // Load JSON manifest
 async function loadManifest() {
   try {
@@ -29,6 +30,7 @@ async function loadManifest() {
     empty.style.display = 'block';
   }
 }
+
 
 // Render video cards
 function renderGrid() {
@@ -81,10 +83,23 @@ function renderGrid() {
 
     // Card click opens video player
     card.addEventListener('click', () => openPlayer(v));
+    card.addEventListener('mouseenter', () => {
+      video.currentTime = 0;
+      img.style.display = 'none';
+      video.style.display = 'block';
+      video.play().catch(() => {});
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      video.pause();
+      video.style.display = 'none';
+      img.style.display = 'block';
+    });
 
     grid.appendChild(node);
   }
 }
+
 
 // Fullscreen video player
 function openPlayer(v) {
@@ -134,29 +149,18 @@ function closePlayer() {
 
 
 // Event listeners
-card.addEventListener('mouseenter', () => {
-  video.currentTime = 0;
-  img.style.display = 'none';
-  video.style.display = 'block';
-  video.play().catch(() => {});
-});
-
-card.addEventListener('mouseleave', () => {
-  video.pause();
-  video.style.display = 'none';
-  img.style.display = 'block';
-});
-
 closeBtn.addEventListener('click', closePlayer);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
 searchInput.addEventListener('input', debounce(renderGrid, 180));
 sortSelect.addEventListener('change', renderGrid);
+
 
 // Debounce helper
 function debounce(fn, wait) {
   let t;
   return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), wait); };
 }
+
 
 // Initialize
 loadManifest();
