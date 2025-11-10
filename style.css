@@ -10,7 +10,7 @@
 html, body {
   height: 100%;
   margin: 0;
-  background: linear-gradient(180deg, #220126 0%, #380140 100%);
+  background: #220126;
   color: #ffffff;
   font-family: Inter, ui-sans-serif, system-ui, Arial, sans-serif;
 }
@@ -68,10 +68,10 @@ select {
 }
 
 .card {
-  background: #7C038C;
+  background: #380140;
   border-radius: 12px;
   padding: 10px;
-  box-shadow: 0 6px 20px rgba(2, 6, 23, 0.6);
+  box-shadow: 0 6px 20px rgba(0,0,0, 0.6);
   cursor: pointer;
   transition: transform 0.14s;
 }
