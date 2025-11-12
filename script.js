@@ -114,44 +114,76 @@ function openPlayer(v) {
   modalTitle.textContent = v.title || v.file;
   modalDesc.textContent = v.description || '';
   downloadBtn.onclick = () => window.open(v.file, '_blank');
+  document.body.style.overflow = 'hidden';
 
   const src = v.file;
-  videoPlayer.poster = v.thumb || '';
-  
-  // If HLS.js is supported and it's an m3u8 file
-  if (Hls.isSupported() && src.endsWith('.m3u8')) {
-    const hls = new Hls();
-    hls.loadSource(src);
-    hls.attachMedia(videoPlayer);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      videoPlayer.play().catch(() => {});
-    });
-  } 
-  // If the browser supports HLS natively (Safari, iOS)
-  else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-    videoPlayer.src = src;
-    videoPlayer.addEventListener('loadedmetadata', () => {
-      videoPlayer.play().catch(() => {});
-    });
-  } 
-  // Otherwise normal video (mp4, webm, etc.)
-  else {
-    videoPlayer.src = src;
-    videoPlayer.play().catch(() => {});
-  }
+  const isEmbed = src.includes('youtube.com/embed') || src.includes('player.vimeo.com') || src.includes('iframe');
 
-  document.body.style.overflow = 'hidden';
+  // Clear the modal before adding the player
+  const existingIframe = modal.querySelector('iframe');
+  if (existingIframe) existingIframe.remove();
+
+  // Reset video player
+  videoPlayer.pause();
+  videoPlayer.removeAttribute('src');
+  videoPlayer.style.display = 'none';
+
+  if (isEmbed) {
+    // Create an iframe for embeds
+    const iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.allow =
+      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.flex = '1';
+    videoPlayer.replaceWith(iframe);
+  } else {
+    // Restore video element if not an embed
+    const existingIframe2 = modal.querySelector('iframe');
+    if (existingIframe2) existingIframe2.remove();
+    if (!modal.contains(videoPlayer)) {
+      const playerContainer = modal.querySelector('.player');
+      playerContainer.insertBefore(videoPlayer, modalDesc);
+    }
+
+    videoPlayer.style.display = 'block';
+    videoPlayer.poster = v.thumb || '';
+
+    if (Hls.isSupported() && src.endsWith('.m3u8')) {
+      const hls = new Hls();
+      hls.loadSource(src);
+      hls.attachMedia(videoPlayer);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play().catch(() => {}));
+    } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+      videoPlayer.src = src;
+      videoPlayer.addEventListener('loadedmetadata', () => videoPlayer.play().catch(() => {}));
+    } else {
+      videoPlayer.src = src;
+      videoPlayer.play().catch(() => {});
+    }
+  }
 }
 
 
 function closePlayer() {
   modal.style.display = 'none';
   modal.setAttribute('aria-hidden', 'true');
+
+  // Stop video
   videoPlayer.pause();
   videoPlayer.removeAttribute('src');
   videoPlayer.load();
+
+  // Remove iframe if any
+  const existingIframe = modal.querySelector('iframe');
+  if (existingIframe) existingIframe.remove();
+
   document.body.style.overflow = '';
 }
+
 
 
 // Event listeners
