@@ -120,10 +120,10 @@ function openPlayer(v) {
   downloadBtn.onclick = () => window.open(v.file, '_blank');
   document.body.style.overflow = 'hidden';
 
-  const src = v.file;
-  const isEmbed = src.includes('youtube.com/embed') || src.includes('player.vimeo.com') || src.includes('iframe');
+  const src = v.file || v.video || v.link || '';
+  const thumb = v.thumb || v.thumbnail || '';
 
-  // Clear the modal before adding the player
+  // Clear any previous iframe
   const existingIframe = modal.querySelector('iframe');
   if (existingIframe) existingIframe.remove();
 
@@ -132,42 +132,64 @@ function openPlayer(v) {
   videoPlayer.removeAttribute('src');
   videoPlayer.style.display = 'none';
 
+  // 🧠 Detect embed-like links (not just YouTube)
+  const isEmbed =
+    src.includes('youtube.com/embed') ||
+    src.includes('youtu.be') ||
+    src.includes('player.vimeo.com') ||
+    src.includes('dailymotion.com/embed') ||
+    src.includes('twitch.tv/player') ||
+    src.includes('soundcloud.com/player') ||
+    src.includes('/embed/') ||
+    src.endsWith('.html');
+
   if (isEmbed) {
-    // Create an iframe for embeds
+    // ✅ Create a universal iframe player
     const iframe = document.createElement('iframe');
     iframe.src = src;
     iframe.allow =
-      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen';
     iframe.allowFullscreen = true;
     iframe.style.width = '100%';
     iframe.style.height = '100%';
     iframe.style.border = 'none';
     iframe.style.flex = '1';
+
+    // Special case for Twitch (requires ?parent=yourdomain)
+    if (src.includes('twitch.tv/player') && !src.includes('parent=')) {
+      const parent = location.hostname || 'localhost';
+      iframe.src += (src.includes('?') ? '&' : '?') + 'parent=' + parent;
+    }
+
+    // Replace video player element with iframe
     videoPlayer.replaceWith(iframe);
+    return; // Exit early — no further video logic
+  }
+
+  // ✅ Non-embed (direct video files, m3u8, etc.)
+  const existingIframe2 = modal.querySelector('iframe');
+  if (existingIframe2) existingIframe2.remove();
+
+  // Restore <video> element if missing
+  if (!modal.contains(videoPlayer)) {
+    const playerContainer = modal.querySelector('.player');
+    playerContainer.insertBefore(videoPlayer, modalDesc);
+  }
+
+  videoPlayer.style.display = 'block';
+  videoPlayer.poster = thumb;
+
+  if (Hls.isSupported() && src.endsWith('.m3u8')) {
+    const hls = new Hls();
+    hls.loadSource(src);
+    hls.attachMedia(videoPlayer);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play().catch(() => {}));
+  } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+    videoPlayer.src = src;
+    videoPlayer.addEventListener('loadedmetadata', () => videoPlayer.play().catch(() => {}));
   } else {
-    // Restore video element if not an embed
-    const existingIframe2 = modal.querySelector('iframe');
-    if (existingIframe2) existingIframe2.remove();
-    if (!modal.contains(videoPlayer)) {
-      const playerContainer = modal.querySelector('.player');
-      playerContainer.insertBefore(videoPlayer, modalDesc);
-    }
-
-    videoPlayer.style.display = 'block';
-    videoPlayer.poster = v.thumb || '';
-
-    if (Hls.isSupported() && src.endsWith('.m3u8')) {
-      const hls = new Hls();
-      hls.loadSource(src);
-      hls.attachMedia(videoPlayer);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play().catch(() => {}));
-    } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-      videoPlayer.src = src;
-      videoPlayer.addEventListener('loadedmetadata', () => videoPlayer.play().catch(() => {}));
-    } else {
-      videoPlayer.src = src;
-      videoPlayer.play().catch(() => {});
-    }
+    videoPlayer.src = src;
+    videoPlayer.play().catch(() => {});
   }
 }
 
